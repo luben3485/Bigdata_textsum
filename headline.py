@@ -20,7 +20,7 @@ from six.moves import xrange
 import tensorflow as tf
 
 #parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # parent folder
-parent_dir = "/home/luben3485/college/robot/textsum/textsum"# parent folder
+parent_dir = "/home/team6/Bigdata_textsum"# parent folder
 sys.path.append(parent_dir)
 
 #from textsum import data_utils # absolute import
@@ -29,10 +29,11 @@ sys.path.append(parent_dir)
 import data_utils
 import seq2seq_model
 
-#file_path = os.path.dirname(os.path.abspath(__file__))
-file_path = "/home/luben3485/college/robot/textsum/textsum"
-data_path = "/home/luben3485/college/robot/textsum/textsum/news"
-train_dir = "/home/luben3485/college/robot/textsum/textsum/ckpt"
+file_path = os.path.dirname(os.path.abspath(__file__))
+print(file_path)
+file_path = "/home/team6/Bigdata_textsum"
+data_path = "/home/team6/Bigdata_textsum/news"
+train_dir = "/home/team6/Bigdata_textsum/ckpt"
 #data_path = os.path.join(file_path, "news")
 #train_dir = os.path.join(file_path, "ckpt")
 
@@ -144,16 +145,15 @@ def create_model(session, forward_only):
         use_lstm = True, # LSTM instend of GRU
         num_samples = FLAGS.num_samples,
         forward_only=forward_only)
-  s = FLAGS.train_dir 
-  print(s)
+  
   ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
   if ckpt:
     model_checkpoint_path = ckpt.model_checkpoint_path
-    model_checkpoint_path = "/home/luben3485/college/robot/textsum/textsum/ckpt"
+    #model_checkpoint_path = "/home/team6/Bigdata_textsum/ckpt"
     print("Reading model parameters from %s" % model_checkpoint_path)
     saver = tf.train.Saver()
-    #saver.restore(session, tf.train.latest_checkpoint(FLAGS.train_dir))
-    saver.restore(session,"/home/luben3485/college/robot/textsum/textsum/ckpt/headline_large.ckpt-48000")
+    saver.restore(session, tf.train.latest_checkpoint(FLAGS.train_dir))
+    #saver.restore(session,"/home/team6/Bigdata_textsum/ckpt/headline_large.ckpt-48000")
   else:
     print("Created model with fresh parameters.")
     session.run(tf.global_variables_initializer())
@@ -166,9 +166,9 @@ def train():
   src_train, dest_train, src_dev, dest_dev, _, _ = data_utils.prepare_headline_data(FLAGS.data_dir, FLAGS.vocab_size)
   
   # device config for CPU usage
-  config = tf.ConfigProto(device_count={"CPU": 4}, # limit to 4 CPU usage
-                   inter_op_parallelism_threads=1, 
-                   intra_op_parallelism_threads=2) # n threads parallel for ops
+  config = tf.ConfigProto(device_count={"CPU": 4}) # limit to 4 CPU usage
+                  # inter_op_parallelism_threads=1, 
+                  # intra_op_parallelism_threads=2) # n threads parallel for ops
   
   with tf.Session(config = config) as sess:
     # Create model.
